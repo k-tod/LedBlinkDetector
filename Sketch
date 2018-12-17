@@ -1,0 +1,50 @@
+#include "DigiKeyboard.h"
+int sensorValue = 0;    // value of the photoresistor
+int blinkCounter = 0;   // counter for the number of led blinks
+int ledState = 0;       // current state of the led
+int lastLedState = 0;   // previous state of the led
+void setup() {
+  // put your setup code here, to run once:
+  pinMode(0, OUTPUT); //Pin of the photocoupler
+  pinMode(2, INPUT);  //Pin of the photoresistor
+}
+
+void loop() {
+  sensorValue = analogRead(1); //Read P2(photoresistor)
+  DigiKeyboard.println(sensorValue);
+  if(sensorValue > 100){
+    ledState = 1;  
+    }else{
+      ledState = 0;
+      }
+  DigiKeyboard.delay(30); // typical time for photocell to detect sudden change in light
+
+  // compare the ledState to its previous state
+  if (ledState != lastLedState) {
+    // if the state has changed, increment the counter
+    if (ledState == HIGH) {
+      // if the current state is HIGH then the led went from off to on:
+    } else {
+      // If the current state is LOW then the led went from on to off:
+      blinkCounter++;
+      DigiKeyboard.println("number of led blinks: ");
+      DigiKeyboard.println(blinkCounter);
+    }
+  }
+  // Save the current state as the last state, for next time through the loop
+  lastLedState = ledState;
+
+  // Turns on the optocoupler every four led blinks 
+  if (blinkCounter > 3) {
+    digitalWrite(0, HIGH);
+    DigiKeyboard.println("Triggering Flic button");
+    digitalWrite(0, LOW);
+    DigiKeyboard.println("Wait 30s for emergency recording to finish");
+    delay(30000); // wait for emergency recording to finish.
+    blinkCounter = 0;
+    DigiKeyboard.println("Ready to trigger the button again");
+  } else {
+    digitalWrite(0, LOW);
+    //DigiKeyboard.println("Output: 0");
+  }
+}
